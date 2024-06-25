@@ -2,6 +2,7 @@ import express from 'express';
 import './src/config/connection.js'; // Ensure connection is established
 import adminRoutes from './src/routes/admin.js'; // Ensure correct relative path
 import videoRoutes from './src/routes/videoRoutes.js';
+import settingRoutes from "./src/routes/settingRoutes.js";
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -13,7 +14,13 @@ app.use(express.json()); // Use express built-in middleware instead of body-pars
 
 // Routes
 app.use('/admin', adminRoutes);
+
+//videos routes
 app.use('/videos', videoRoutes);
+
+//setting routes 
+
+app.use('/setting',settingRoutes);
 
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
