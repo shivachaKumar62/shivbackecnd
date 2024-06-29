@@ -1,11 +1,13 @@
 import express from 'express';
 import './src/config/connection.js'; // Ensure connection is established
 import adminRoutes from './src/routes/admin.js'; // Ensure correct relative path
-//import videoRoutes from './src/routes/videoRoutes.js';
 import settingRoutes from "./src/routes/settingRoutes.js";
 import fileRoutes from './src/routes/filesRoutes.js';
 import csvRoutes from './src/routes/csvRoutes.js';
+import userRoutes from "./src/routes/userRoutes.js";
 import dotenv from 'dotenv';
+import cors from "cors";
+
 dotenv.config();
 
 const app = express();
@@ -14,11 +16,10 @@ const PORT = process.env.PORT || 8000; // Ensure this is a port above 1024
 // Middleware
 app.use(express.json()); // Use express built-in middleware instead of body-parser
 
+app.use(cors());
+
 // Routes
 app.use('/admin', adminRoutes);
-
-//videos routes
-//app.use('/videos', videoRoutes);
 
 //setting routes 
 app.use('/setting',settingRoutes);
@@ -28,6 +29,11 @@ app.use('/file', fileRoutes);
 
 //csv files
 app.use('/csv', csvRoutes);
+
+//user routes
+app.use('/user', userRoutes);
+
+
 
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
