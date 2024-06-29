@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 export const registerAdmin = async (req, res) => {
   try {
-    const { email, first_name, last_name, username, phone,  password } = req.body;
+    const { email,  phone,  password } = req.body;
 
     // Check if email, phone, or Gmail is provided
     if (!email && !phone ) {
@@ -26,9 +26,6 @@ export const registerAdmin = async (req, res) => {
     // Create a new admin
     const newAdmin = new Admin({
       email,
-      first_name,
-      last_name,
-      username,
       phone,
       password: hashedPassword, // Save the hashed password or null if not provided
     });

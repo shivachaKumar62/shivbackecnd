@@ -1,14 +1,16 @@
 import CSV from '../models/csvModel.js';
 import Admin from '../models/admin.js';
-import Setting from '../models/settingModel.js';
+
 
 
 export const createCSV = async (req, res) => {
     try {
       const { user_id } = req.body;
-      const BASE_URL = await Setting.findValueByKey("base_url");
-      const csv_path = `${BASE_URL}/${req.file.path}`;
-  
+
+      const protocol = req.protocol; // http or https
+      const host = req.get('host'); // hostname (e.g., localhost:3000)
+      const csv_path = `${protocol}://${host}/${req.file.path}`;
+
       // Ensure that user_id exists
       const user = await Admin.findById(user_id);
       

@@ -1,9 +1,9 @@
 import express from 'express';
 import './src/config/connection.js'; // Ensure connection is established
 import adminRoutes from './src/routes/admin.js'; // Ensure correct relative path
-import videoRoutes from './src/routes/videoRoutes.js';
+//import videoRoutes from './src/routes/videoRoutes.js';
 import settingRoutes from "./src/routes/settingRoutes.js";
-import audioRoutes from './src/routes/audioRoutes.js';
+import fileRoutes from './src/routes/filesRoutes.js';
 import csvRoutes from './src/routes/csvRoutes.js';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -18,13 +18,13 @@ app.use(express.json()); // Use express built-in middleware instead of body-pars
 app.use('/admin', adminRoutes);
 
 //videos routes
-app.use('/videos', videoRoutes);
+//app.use('/videos', videoRoutes);
 
 //setting routes 
 app.use('/setting',settingRoutes);
 
 //audio routes
-app.use('/audio', audioRoutes);
+app.use('/file', fileRoutes);
 
 //csv files
 app.use('/csv', csvRoutes);

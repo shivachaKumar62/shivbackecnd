@@ -2,7 +2,7 @@ import Video from "../models/video.js";
 
 export const uploadVideo = async (req, res) => {
   try {
-    const { user_id, trim_timing } = req.body;
+    const { user_id, trim_timing,csv_id } = req.body;
 
     const baseUrl = process.env.BASE_URL;
     const videoPath = `${baseUrl}/${req.file.path}`;
@@ -11,6 +11,7 @@ export const uploadVideo = async (req, res) => {
       user_id,
       trim_timing,
       videoPath,
+      csv_id,
     });
 
     await newVideo.save();

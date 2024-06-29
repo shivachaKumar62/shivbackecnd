@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
-const audioSchema = new mongoose.Schema({
-  audio_path: {
+const filesSchema = new mongoose.Schema({
+  path: {
     type: String,
     required: true,
   },
@@ -15,10 +15,13 @@ const audioSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  file_type:{
+    type:String
+  }
 }, {
     timestamps: true
 });
 
-const Audio = mongoose.model('Audio', audioSchema);
+const File = mongoose.model('File', filesSchema);
 
-export default Audio;
+export default File;
