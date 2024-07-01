@@ -7,8 +7,8 @@ import jwt from 'jsonwebtoken';
 
 export const  registerUser = async (req, res) => {
     
-    const { phone, email, gmail_token, country_code,password } = req.body;
-
+  const { phone, email, gmail_token, country_code, password } = req.body;
+  
     try {
         if (phone) {
             await sendTwoFactorOTP(country_code, phone);
@@ -16,7 +16,8 @@ export const  registerUser = async (req, res) => {
         }
 
         if (email) {
-          const { message, token } = await registerByEmail(email, password);
+         
+          const { message, token } = await registerByEmail(email, password,phone);
           return res.status(200).json({ message, token });
         }
 
@@ -57,27 +58,19 @@ async function registerByEmail(email, password) {
   
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        const passwordMatch = await bcrypt.compare(password, existingUser.password);
-        if (!passwordMatch) {
-          throw new Error("Incorrect password");
-        }
-  
-        // Generate JWT token
-        const token = jwt.sign({ existingUser }, accessToken, { expiresIn: '24h' });
-        return { message: "Successfully logged in", token };
+        return { message: "user already exists"};
       }
   
       const hashedPassword = await bcrypt.hash(password, 10);
-  
+      
       const newUser = new User({
         email,
         password: hashedPassword,
       });
   
       await newUser.save();
-      const token = jwt.sign({ newUser }, accessToken, { expiresIn: '24h' });
-  
-      return { message: "Successfully registered", token };
+      
+      return { message: "Successfully registered" };
     } catch (error) {
       throw new Error(`Failed to register by email: ${error.message}`);
     }
@@ -139,21 +132,69 @@ export const otpVerification = async (req, res) => {
 
 export const newPassword = async (req, res) => {
     try {
-      const { email, new_password} = req.body;
+      const { email, new_password } = req.body;
   
       const user = await User.findOne({ email });
   
       if (!user) {
-        return res.status(400).json({ error: 'Invalid reset token or email.' });
+        return res.status(400).json({ error: 'This email does not exist' });
       }
+  
+      const isSamePassword = await bcrypt.compare(new_password, user.password);
+      if (isSamePassword) {
+        return res.status(400).json({ error: 'New password must be different from the old password' });
+      }
+  
       const hashedPassword = await bcrypt.hash(new_password, 10);
       user.password = hashedPassword;
       await user.save();
   
-     
       res.status(200).json({ message: 'Password updated successfully.' });
     } catch (error) {
-     
       res.status(500).json({ error: 'Internal server error' });
     }
   };
+
+export const userSignIn = async (req, res) => {
+    const { email, password } = req.body;
+
+    const accessToken = "87819852db76f1a11cbef388e743bc1766bafcce3d3a34c7057d43f798174edc52f0e4dfebec2e1d5b2e91312210b02151441f9487a598894fa9ac3e1adda035" || await Setting.findValueByKey("ACCESS_TOKEN");
+      if (!accessToken) {
+        throw new Error("Access token not found");
+      }
+  
+    try {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        const passwordMatch = await bcrypt.compare(password, existingUser.password);
+        if (!passwordMatch) {
+          return res.status(401).json({ message: "Incorrect password" });
+        }
+  
+        // Generate JWT token
+        const token = jwt.sign({ existingUser }, accessToken, { expiresIn: '24h' });
+        return res.status(200).json({ message: "Successfully logged in", token });
+      }
+  
+      return res.status(404).json({ message: "This user does not exist" });
+    } catch (error) {
+      return res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }; 
+
+export const forgot = async (req, res) => {
+    try {
+      const { email } = req.body;
+  
+      const user = await User.findOne({ email });
+  
+      if (!user) {
+        return res.status(400).json({ error: 'This email does not exist' });
+      }
+  
+      res.status(200).json({ message: 'Email verified' });
+  
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+};
